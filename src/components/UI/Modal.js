@@ -11,7 +11,7 @@ class Model extends Component{
     shouldComponentUpdate(nextProps , nextSate){  
         //it tregar Render. If its false page will not render anything
         //in here used for update performance
-        return nextProps.show !== this.props.show;
+        return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
     }
 
     componentWillUpdate(){

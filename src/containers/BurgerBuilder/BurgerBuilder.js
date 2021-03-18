@@ -126,6 +126,7 @@ class BurgerBuilder extends Component{
             //encodeURIComponent encode convart the element to usable in URL
             //convart critical elemnets to non-critical elements
         }
+        queryParams.push('price='+this.state.totalPrice);
         const querystring= queryParams.join('&');
         this.props.history.push({
             pathname:'/checkout',

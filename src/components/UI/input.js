@@ -3,23 +3,27 @@ import classes from './input.css';
 
 const input =(props)=>{
     let inputElement=null;
+    const inputClass=[classes.InputElement];
+    if(props.invalid && props.shouldValidate && props.touched ){
+        inputClass.push(classes.Invalid);
+    }
     switch(props.elementType){
         case('input'):
-            inputElement=<input className={classes.InputElement} 
+            inputElement=<input className={inputClass.join(' ')} 
                     {...props.elementConfig} 
                     value={props.value}
                     onChange={props.changed}
                     />;
             break;
         case('input'):
-            inputElement=<input className={classes.InputElement} 
+            inputElement=<input className={inputClass.join(' ')} 
                     {...props.elementConfig} 
                     value={props.value}
                     onChange={props.changed}
                     />;
             break;
         case('select'):
-            inputElement=(<select className={classes.InputElement} 
+            inputElement=(<select className={inputClass.join(' ')} 
                         value={props.value}
                         onChange={props.changed}
                         >
@@ -33,7 +37,7 @@ const input =(props)=>{
                     </select>);
             break;
         default:
-            inputElement=<input className={classes.InputElement} 
+            inputElement=<input className={inputClass.join(' ')} 
                 {...props.elementConfig} 
                 value={props.value}
                 onChange={props.changed}/>;

@@ -6,47 +6,34 @@ import Modal from '../../components/UI/Modal';
 import OrderSummery from '../../components/Burger/OrderSummery/OrderSummery';
 //npm install --save axios
 import axios from '../../axios-orders';
-import orderSimmary from '../../components/Burger/OrderSummery/OrderSummery';
 import Spinner from '../../components/UI/Spiner';
 import withErrorHandler from '../../hoc/withErrorHandler';
-import * as actionTypes from '../../store/action';
+//import * as actionTypes from '../../store/actions/actionTypes';
+import * as burgerBuilderActions from '../../store/actions/index';
 
 import {connect} from 'react-redux';
 
 
-const Ingredient_Price ={
-    salad:5,
-    bacon:6,
-    cheese:7,
-    meat:10,
-    loading:false
-};
+// const Ingredient_Price ={
+//     salad:5,
+//     bacon:6,
+//     cheese:7,
+//     meat:10,
+//     loading:false
+// };
 
 class BurgerBuilder extends Component{
 
     
     state ={
-        // ingredients: {  //its a abject
-        //     salad:0,
-        //     bacon:0,
-        //     cheese:0,
-        //     meat:0
-        //  },
-        ingredients: null,
-        totalPrice :4,
         purchasable: false,
         purchasing : false,
-        error:false
 
     }
 
     
     componentDidMount(){
-        axios.get('https://react-my-burger-8e4ce-default-rtdb.firebaseio.com/ingredients.json')
-        .then(response =>{
-            this.setState({ingredients : response.data})
-        })
-        .catch(error=>{this.setState({error : true})});
+       this.props.onIngredient();
     }
 
     upadtePurcheseState(ingredients){
@@ -55,7 +42,8 @@ class BurgerBuilder extends Component{
             return ingredients[igKey];
         }).reduce((sum,el) =>{ return sum+el;},0);
 
-        this.setState({purchasable: sum>0});
+        //this.setState({purchasable: sum>0});
+        return sum>0;
     }
 
     // addIngredientHandler =(type) =>{
@@ -99,7 +87,8 @@ class BurgerBuilder extends Component{
 
     purchaseContinueHandler=()=>{
         //alert('You COntinue!');
-        this.setState({loading: true});
+   
+       // this.setState({loading: true});
 
         // const order ={
         //     ingredients: this.state.ingredients,
@@ -123,21 +112,23 @@ class BurgerBuilder extends Component{
         //     error => console.log(error),
         //     this.setState({loading: false, purchasing: false})
         // );
-        const queryParams=[];
-        for (let i in this.state.ingredients){
-            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
-            //encodeURIComponent encode convart the element to usable in URL
-            //convart critical elemnets to non-critical elements
-        }
-        queryParams.push('price='+this.state.totalPrice);
-        const querystring= queryParams.join('&');
-        this.props.history.push({
-            pathname:'/checkout',
-            search:'?'+querystring
-            /*its make the url looklike this
-            http://localhost:3001/checkout?bacon=0&cheese=1&meat=1&salad=1
-            */
-        });
+        // const queryParams=[];
+        // for (let i in this.state.ingredients){
+        //     queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
+        //     //encodeURIComponent encode convart the element to usable in URL
+        //     //convart critical elemnets to non-critical elements
+        // }
+        // queryParams.push('price='+this.state.totalPrice);
+        // const querystring= queryParams.join('&');
+        // this.props.history.push({
+        //     pathname:'/checkout',
+        //     search:'?'+querystring
+        //     /*its make the url looklike this
+        //     http://localhost:3001/checkout?bacon=0&cheese=1&meat=1&salad=1
+        //     */
+        // });
+
+        this.props.history.push('/checkout');
     }
 
 
@@ -160,10 +151,9 @@ class BurgerBuilder extends Component{
         // }
 
         let burger;
-        //let burger= this.state.error ? <p>Cant connect with server! </p> : <Spinner/>
+        burger= this.props.error ? <p>Cant connect with server! </p> : <Spinner/>
                 // ^if there is error chage link in componentDidMount to see the effect
         
-        console.log("dd "+this.props.ings)
          if(this.props.ings){
            
             burger= (
@@ -173,8 +163,8 @@ class BurgerBuilder extends Component{
                         ingredientAdded = {this.props.onIngredientAdded}
                         ingredientRemoved={this.props.onIngredientRemove}
                         disabled={disableInfo}
-                        purchasable = {this.state.purchasable}
-                        price ={this.state.totalPrice}
+                        purchasable = {this.upadtePurcheseState(this.props.ings)}
+                        price ={this.props.price}
                         ordered={this.purchaseHandler}
                     />
                 </Aux>      
@@ -184,7 +174,7 @@ class BurgerBuilder extends Component{
             ingredients={this.props.ings}
             purchaseCanclled={this.closeModalHandaler}
             purchaseContinued={this.purchaseContinueHandler}  
-            price ={this.state.totalPrice}/>
+            price ={this.props.price}/>
         }
 
         return(
@@ -204,19 +194,27 @@ class BurgerBuilder extends Component{
 const mapStateToProps = state =>{
     return {
         
-        ings:state.ingredients
+        ings:state.burgerBuilder.ingredients, //this proses called fatch
+        price:state.burgerBuilder.totalPrice,
+        error:state.burgerBuilder.error,
     };
 }
 const mapDispatchToProps = dispatch =>{
     return {
-        onIngredientAdded:(ingName)=>dispatch({
-            type:actionTypes.ADD_INGREDIENT,
-            ingredientName:ingName
-        }),
-        onIngredientRemove:(ingName)=>dispatch({
-            type:actionTypes.REMOVE_INGREDIENT,
-            ingredientName:ingName
-        })
+        onIngredientAdded:(ingName)=>dispatch(
+            // type:actionTypes.ADD_INGREDIENT,
+            // ingredientName:ingName
+            burgerBuilderActions.addIngredient(ingName)
+        ),
+        onIngredientRemove:(ingName)=>dispatch(
+            // type:actionTypes.REMOVE_INGREDIENT,
+            // ingredientName:ingName
+            burgerBuilderActions.removeIngredient(ingName)
+        ),
+        onIngredient:()=>dispatch(
+            burgerBuilderActions.initIngredients())
+        
+        
     }
 }
 

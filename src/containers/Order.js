@@ -2,6 +2,7 @@ import React from 'react';
 
 import classes from './Order.css';
 
+
 const order = ( props ) => {
     const ingredients = [];
 
@@ -35,5 +36,6 @@ const order = ( props ) => {
         </div>
     );
 };
+
 
 export default order;

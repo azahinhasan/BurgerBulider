@@ -8,7 +8,11 @@ const navigationItems =(props) =>(
     <ul className={classes.NavigationItems}>
         {/*For boolian we can write only active exepct ={true}*/}
         <NavigationItem link="/" exact>Burger Builder</NavigationItem>
-        <NavigationItem link="/orders" >Checkout</NavigationItem>
+
+        {props.isAuth? <NavigationItem link="/orders" >Orders</NavigationItem> : null}
+
+        { !props.isAuth ? <NavigationItem link="/auth" >Auth</NavigationItem>
+            : <NavigationItem link="/logout" >LogOut</NavigationItem>}
     </ul>
 );
 
